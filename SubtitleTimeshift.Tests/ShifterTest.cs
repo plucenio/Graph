@@ -25,6 +25,10 @@ namespace SubtitleTimeshift.Tests
             }
 
             using (var outputStream = new FileStream(outputPath, FileMode.Open, FileAccess.Read))
+            {
+                outputStream.Flush();
+                outputStream.Close();
+            }
             using (var outputReader = new StreamReader(outputPath, encoding, true))
             using (var assertStream = new FileStream(assertPath, FileMode.Open, FileAccess.Read))
             using (var assertReader = new StreamReader(assertStream, encoding, true))
@@ -32,7 +36,7 @@ namespace SubtitleTimeshift.Tests
                 var assertLine = default(string);
                 var outputLine = default(string);
 
-                while(null != (assertLine = await assertReader.ReadLineAsync()))
+                while (null != (assertLine = await assertReader.ReadLineAsync()))
                 {
                     Assert.IsFalse(outputReader.EndOfStream);
                     outputLine = await outputReader.ReadLineAsync();

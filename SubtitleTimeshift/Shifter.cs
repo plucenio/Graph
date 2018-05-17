@@ -11,28 +11,32 @@ namespace SubtitleTimeshift
         async static public Task Shift(Stream input, Stream output, TimeSpan timeSpan, Encoding encoding, int bufferSize = 1024, bool leaveOpen = false)
         {
             Regex g = new Regex(@"(?<start>\S+)\s-->\s(?<end>\S+)");
-            using (StreamReader r = new StreamReader(input))
+            using (StreamWriter writer = new StreamWriter(output, encoding, bufferSize, leaveOpen))
             {
-                string line;
-                while ((line = r.ReadLine()) != null)
+                using (StreamReader reader = new StreamReader(input, encoding, true, bufferSize, leaveOpen))
                 {
-                    Match m = g.Match(line);
-                    if (m.Success)
-                    {                        
-                        string start = m.Groups[1].Value;
-                        string end = m.Groups[2].Value;
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        Match m = g.Match(line);
+                        if (m.Success)
+                        {
+                            string start = m.Groups[1].Value;
+                            string end = m.Groups[2].Value;
 
-                        var newStart = TimeSpan.Parse(start.Replace(",", ".")).Add(timeSpan).ToString().Replace(".", ",");
-                        var newEnd = TimeSpan.Parse(end.Replace(",", ".")).Add(timeSpan).ToString().Replace(".",",");
+                            var newStart = TimeSpan.Parse(start.Replace(",", ".")).Add(timeSpan).ToString().Replace(".", ",");
+                            var newEnd = TimeSpan.Parse(end.Replace(",", ".")).Add(timeSpan).ToString().Replace(".", ",");
 
-                        line = line.Replace(start, newStart);
-                        line = line.Replace(end, newEnd);
+                            line = line.Replace(start, newStart);
+                            line = line.Replace(end, newEnd);
+                        }                        
+
+                        //byte[] bytes = encoding.GetBytes(line);
+
+                        //output.Write(bytes, 0, 1);
+
+                        writer.WriteLine(line);
                     }
-
-                    byte[] bytes = encoding.GetBytes(line);
-
-                    output.Write(bytes, 0, 1);
-                    output.Flush();
                 }
             }
         }
