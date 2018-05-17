@@ -18,9 +18,21 @@ namespace SubtitleTimeshift
                 {
                     Match m = g.Match(line);
                     if (m.Success)
-                    {
-                        string v = m.Groups[1].Value;
+                    {                        
+                        string start = m.Groups[1].Value;
+                        string end = m.Groups[2].Value;
+
+                        var newStart = TimeSpan.Parse(start.Replace(",", ".")).Add(timeSpan).ToString().Replace(".", ",");
+                        var newEnd = TimeSpan.Parse(end.Replace(",", ".")).Add(timeSpan).ToString().Replace(".",",");
+
+                        line = line.Replace(start, newStart);
+                        line = line.Replace(end, newEnd);
                     }
+
+                    byte[] bytes = encoding.GetBytes(line);
+
+                    output.Write(bytes, 0, 1);
+                    output.Flush();
                 }
             }
         }
