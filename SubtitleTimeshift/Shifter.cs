@@ -25,8 +25,8 @@ namespace SubtitleTimeshift
                             string start = m.Groups[1].Value;
                             string end = m.Groups[2].Value;
 
-                            var newStart = TimeSpan.Parse(start, new CultureInfo("id-ID")).Add(timeSpan).ToString("hh':'mm':'ss'.'fff");
-                            var newEnd = TimeSpan.Parse(end, new CultureInfo("id-ID")).Add(timeSpan).ToString("hh':'mm':'ss'.'fff");
+                            var newStart = TimeSpan.Parse(start, new CultureInfo("id-ID")).Add(timeSpan).ToString("hh':'mm':'ss'.'fff", new CultureInfo("en-US"));
+                            var newEnd = TimeSpan.Parse(end, new CultureInfo("id-ID")).Add(timeSpan).ToString("hh':'mm':'ss'.'fff", new CultureInfo("en-US"));
 
                             line = line.Replace(start, newStart);
                             line = line.Replace(end, newEnd);
