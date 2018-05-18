@@ -31,7 +31,7 @@ namespace SubtitleTimeshift
                             line = line.Replace(start, newStart);
                             line = line.Replace(end, newEnd);
                         }
-                        writer.WriteLine(line);
+                        await writer.WriteLineAsync(line);
                     }
                 }
             }
