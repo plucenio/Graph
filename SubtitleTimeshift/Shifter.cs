@@ -13,26 +13,24 @@ namespace SubtitleTimeshift
         {
             Regex regex = new Regex(@"(?<start>\S+)\s-->\s(?<end>\S+)");
             using (StreamWriter writer = new StreamWriter(output, encoding, bufferSize, leaveOpen))
+            using (StreamReader reader = new StreamReader(input, encoding, true, bufferSize, leaveOpen))
             {
-                using (StreamReader reader = new StreamReader(input, encoding, true, bufferSize, leaveOpen))
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
+                    Match m = regex.Match(line);
+                    if (m.Success)
                     {
-                        Match m = regex.Match(line);
-                        if (m.Success)
-                        {
-                            string start = m.Groups[1].Value;
-                            string end = m.Groups[2].Value;
+                        string start = m.Groups[1].Value;
+                        string end = m.Groups[2].Value;
 
-                            var newStart = TimeSpan.Parse(start, new CultureInfo("id-ID")).Add(timeSpan).ToString("hh':'mm':'ss'.'fff", new CultureInfo("en-US"));
-                            var newEnd = TimeSpan.Parse(end, new CultureInfo("id-ID")).Add(timeSpan).ToString("hh':'mm':'ss'.'fff", new CultureInfo("en-US"));
+                        var newStart = TimeSpan.Parse(start, new CultureInfo("id-ID")).Add(timeSpan).ToString("hh':'mm':'ss'.'fff", new CultureInfo("en-US"));
+                        var newEnd = TimeSpan.Parse(end, new CultureInfo("id-ID")).Add(timeSpan).ToString("hh':'mm':'ss'.'fff", new CultureInfo("en-US"));
 
-                            line = line.Replace(start, newStart);
-                            line = line.Replace(end, newEnd);
-                        }
-                        await writer.WriteLineAsync(line);
+                        line = line.Replace(start, newStart);
+                        line = line.Replace(end, newEnd);
                     }
+                    await writer.WriteLineAsync(line);
                 }
             }
         }
