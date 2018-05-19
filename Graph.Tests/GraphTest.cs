@@ -10,7 +10,7 @@ namespace Graph.Tests
     {
         [TestMethod]
         public void TestRoutesBetweenTwoPoints()
-        {
+        {            
             var links = new ILink<string>[]
             {
                 new Link<string>("a","b"),
