@@ -28,13 +28,45 @@ namespace Graph
         {
             return Observable.Create<IEnumerable<T>>(observer =>
             {
-                var ListaDeListas = new List<T>();
-                ListaDeListas.Add(source);
-                ListaDeListas.Add(target);
-                observer.OnNext(ListaDeListas);
-                observer.OnNext(ListaDeListas);
+                List<T> lettersAlreadyUsed = new List<T>();
+                foreach (var item in _links.Where(x => x.Source.Equals(source)))
+                {
+                    var ListaFinal = new List<T>();
+                    T tempSource = item.Source;
+                    T tempTarget = item.Target;
+                    while (!target.Equals(tempSource))
+                    {
+                        ILink<T> next = _links.Where(x => x.Source.Equals(tempSource) && !lettersAlreadyUsed.Contains(x.Target)).FirstOrDefault();
+                        ListaFinal.Add(tempSource);
+                        lettersAlreadyUsed.Add(tempSource);
+                        tempSource = next.Target;
+                    }
+                    ListaFinal.Add(tempSource);
+                    observer.OnNext(ListaFinal);
+                }
                 observer.OnCompleted();
                 return Disposable.Empty;
+
+
+
+
+                /*
+                var ListaFinal = new List<T>();
+                foreach (var item in _links)
+                {
+                    T tempSource = source;
+                    while (!target.Equals(tempSource))
+                    {
+                        ILink<T> next = _links.Where(x => x.Source.Equals(tempSource) && !ListaFinal.Contains(x.Target)).FirstOrDefault();
+                        ListaFinal.Add(tempSource);                        
+                        tempSource = next.Target;
+                    }
+                }
+                observer.OnNext(ListaFinal);
+                observer.OnNext(ListaFinal);
+                observer.OnCompleted();
+                return Disposable.Empty;
+                */
             });
         }
 
