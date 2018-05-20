@@ -1,11 +1,12 @@
 ﻿using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
+//http://rxwiki.wikidot.com/101samples
 
 namespace Graph
 {
@@ -23,13 +24,74 @@ namespace Graph
             _links = links;
         }
 
-        public static IObservable<IEnumerable<T>> MakeObservable_3(Action action)
+        public IObservable<IEnumerable<T>> RoutesBetween(T source, T target)
+        {
+            return Observable.Create<IEnumerable<T>>(observer =>
+            {
+                var ListaDeListas = new List<T>();
+                ListaDeListas.Add(source);
+                ListaDeListas.Add(target);
+                observer.OnNext(ListaDeListas);
+                observer.OnNext(ListaDeListas);
+                observer.OnCompleted();
+                return Disposable.Empty;
+            });
+        }
+
+        /*
+        public IObservable<IEnumerable<T>> RoutesBetween(T source, T target)
+        {
+            return Observable.Create<IEnumerable<T>>(observer =>
+            {
+                T temp2 = target;
+                foreach (var item in _links)
+                {
+                    List<List<ILink<T>>> listaDeListas = new List<List<ILink<T>>>();
+
+                    List<T> lettersAlreadyUsed = new List<T>();
+                    List<ILink<T>> lista = new List<ILink<T>>();
+                    T tempSource = source;
+                    while (!target.Equals(tempSource))
+                    {                
+                        ILink<T> next = _links.Except(lista).Where(x => x.Source.Equals(tempSource) && !lettersAlreadyUsed.Contains(x.Target)).FirstOrDefault();
+                        lista.Add(next);
+                        lettersAlreadyUsed.Add(tempSource);
+                        tempSource = next.Target;                
+                    }
+                    listaDeListas.Add(lista);
+            
+                    observer.OnNext(lista);
+                }
+                observer.OnCompleted();
+                return Disposable.Empty;
+            });
+        }
+        */
+
+        #region Obsoleto
+
+        /*
+        public IObservable<IEnumerable<T>> RoutesBetween(T source, T target)
         {
             return Observable.Create<IEnumerable<T>>(observer =>
             {
                 try
                 {
-                    action();
+                    List<T> lettersAlreadyUsed = new List<T>();
+                    IEnumerable<ILink<T>> newListLinks = new List<ILink<T>>();
+                    while (_links.Except(newListLinks).Any(x => x.Source.Equals(source)))
+                    {
+                        var s = source;
+                        foreach (var link in _links)
+                        {
+                            if (link.Source.Equals(s) && !lettersAlreadyUsed.Contains(link.Target))
+                            {
+                                lettersAlreadyUsed.Add(link.Source);
+                                s = link.Target;
+                                ((List<ILink<T>>)newListLinks).Add(link);
+                            }
+                        }
+                    }
                     observer.OnNext(new List<T>());
                     observer.OnCompleted();
                 }
@@ -40,26 +102,7 @@ namespace Graph
                 return Disposable.Empty;
             });
         }
-
-        public IObservable<IEnumerable<T>> RoutesBetween(T source, T target)
-        {
-            return MakeObservable_3(() => {
-            List<T> lettersAlreadyUsed = new List<T>();
-            IEnumerable<ILink<T>> newListLinks = new List<ILink<T>>();
-                while (_links.Except(newListLinks).Any(x => x.Source.Equals(source)))
-                {
-                    var s = source;
-                    foreach (var link in _links)
-                    {
-                        if (link.Source.Equals(s) && !lettersAlreadyUsed.Contains(link.Target))
-                        {
-                            lettersAlreadyUsed.Add(link.Source);
-                            s = link.Target;
-                            ((List<ILink<T>>)newListLinks).Add(link);
-                        }
-                    }                    
-                }
-            });
-        }
+        */
+        #endregion
     }
 }
